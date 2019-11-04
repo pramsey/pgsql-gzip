@@ -14,12 +14,12 @@ This extension is for that.
 
     > SELECT gzip('this is my this is my this is my this is my text');
 
-                           gzip
-    --------------------------------------------------
-     \x789c2bc9c82c5600a2dc4a851282ccd48a1200a382112e
+                                       gzip
+    --------------------------------------------------------------------------
+     \x1f8b08000000000000132bc9c82c5600a2dc4a851282ccd48a12002e7a22ff30000000
 
 
-    > SELECT encode(gunzip('\x789c2bc9c82c5600a2dc4a851282ccd48a1200a382112e'), 'escape')
+    > SELECT encode(gunzip('\x1f8b08000000000000132bc9c82c5600a2dc4a851282ccd48a12002e7a22ff30000000'), 'escape')
 
                           encode
     --------------------------------------------------
@@ -30,6 +30,7 @@ This extension is for that.
 ## Functions
 
 * `gzip(uncompressed BYTEA, [compression_level INTEGER])` returns `BYTEA`
+* `gzip(uncompressed TEXT, [compression_level INTEGER])` returns `BYTEA`
 * `gunzip(compressed BYTEA)` returns `BYTEA`
 
 

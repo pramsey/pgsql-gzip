@@ -83,12 +83,13 @@ Datum pg_gzip(PG_FUNCTION_ARGS)
 	StringInfoData si;
 	int zs_rv;
 	z_stream zs;
+	uint8 out[ZCHUNK];
+	bytea *compressed;
+
 	bytea *uncompressed = PG_GETARG_BYTEA_P(0);
 	int32 compression_level = PG_GETARG_INT32(1);
 	uint8* in = (uint8*)(uncompressed->vl_dat);
 	size_t in_size = VARSIZE_ANY_EXHDR(uncompressed);
-	uint8 out[ZCHUNK];
-	bytea *compressed;
 
 	if (compression_level < -1 || compression_level > 9)
 		elog(ERROR, "invalid compression level: %d", compression_level);
@@ -102,18 +103,22 @@ Datum pg_gzip(PG_FUNCTION_ARGS)
 	zs.next_in = in;
 	zs.avail_in = in_size;
 
-	if (deflateInit2(&zs, compression_level, Z_DEFLATED, WINDOW_BITS|GZIP_ENCODING, 8, Z_DEFAULT_STRATEGY) != Z_OK)
-		elog(ERROR, "failed to deflateInit");
+	if (deflateInit2(&zs,
+		             compression_level, Z_DEFLATED,
+		             WINDOW_BITS|GZIP_ENCODING, /* Magic to initialize in gzip mode */
+		             8, Z_DEFAULT_STRATEGY) != Z_OK)
+		elog(ERROR, "failed to deflateInit2");
 
 	zs.next_out = out;
 	zs.avail_out = ZCHUNK;
 
-    /* compress until end of bytea */
+	/* compress until end of bytea */
 	zs_rv = Z_OK;
 	while (zs_rv == Z_OK)
 	{
 		if (zs.avail_out == 0)
 		{
+			/* build up output in stringinfo */
 			appendBinaryStringInfo(&si, (char*)out, ZCHUNK);
 			zs.avail_out = ZCHUNK;
 			zs.next_out = out;
@@ -122,6 +127,8 @@ Datum pg_gzip(PG_FUNCTION_ARGS)
 	}
 	assert(zs_rv == Z_STREAM_END);
 	appendBinaryStringInfo(&si, (char*)out, ZCHUNK - zs.avail_out);
+
+	/* Construct output bytea */
 	compressed = palloc(si.len + VARHDRSZ);
 	memcpy(compressed->vl_dat, si.data, si.len);
 	SET_VARSIZE(compressed, si.len + VARHDRSZ);
@@ -137,12 +144,12 @@ Datum pg_gunzip(PG_FUNCTION_ARGS)
 	StringInfoData si;
 	int zs_rv;
 	z_stream zs;
+	uint8 out[ZCHUNK];
+	bytea *uncompressed;
 
 	bytea *compressed = PG_GETARG_BYTEA_P(0);
 	uint8* in = (uint8*)(compressed->vl_dat);
 	size_t in_size = VARSIZE_ANY_EXHDR(compressed);
-	uint8 out[ZCHUNK];
-	bytea *uncompressed;
 
 	initStringInfo(&si);
 
@@ -150,7 +157,8 @@ Datum pg_gunzip(PG_FUNCTION_ARGS)
 	zs.zalloc = pg_gzip_alloc;
 	zs.zfree = pg_gzip_free;
 	zs.opaque = Z_NULL;
-	if (inflateInit2(&zs, WINDOW_BITS | ENABLE_ZLIB_GZIP) != Z_OK)
+	/* Magic to initialize in gzip mode */
+	if (inflateInit2(&zs, WINDOW_BITS|ENABLE_ZLIB_GZIP) != Z_OK)
 		elog(ERROR, "failed to inflateInit");
 
 	zs.next_in = in;
@@ -158,12 +166,13 @@ Datum pg_gunzip(PG_FUNCTION_ARGS)
 	zs.next_out = out;
 	zs.avail_out = ZCHUNK;
 
-    /* decompress until end of bytea */
+	/* decompress until end of bytea */
 	zs_rv = Z_OK;
 	while (zs_rv == Z_OK)
 	{
 		if (zs.avail_out == 0)
 		{
+			/* build up output in stringinfo */
 			appendBinaryStringInfo(&si, (char*)out, ZCHUNK);
 			zs.avail_out = ZCHUNK;
 			zs.next_out = out;
@@ -172,6 +181,8 @@ Datum pg_gunzip(PG_FUNCTION_ARGS)
 	}
 	assert(zs_rv == Z_STREAM_END);
 	appendBinaryStringInfo(&si, (char*)out, ZCHUNK - zs.avail_out);
+
+	/* Construct output bytea */
 	uncompressed = palloc(si.len + VARHDRSZ);
 	memcpy(uncompressed->vl_dat, si.data, si.len);
 	SET_VARSIZE(uncompressed, si.len + VARHDRSZ);
