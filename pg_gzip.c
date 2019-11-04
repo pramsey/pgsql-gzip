@@ -48,8 +48,7 @@
 PG_MODULE_MAGIC;
 
 /**
-* Wrap palloc in a signature that matches what zalloc
-* expects
+* Wrap palloc in a signature that matches what zalloc expects
 */
 static void*
 pg_gzip_alloc(void* opaque, unsigned int items, unsigned int itemsize)
@@ -58,8 +57,7 @@ pg_gzip_alloc(void* opaque, unsigned int items, unsigned int itemsize)
 }
 
 /**
-* Wrap pfree in a signature that matches what zfree
-* expects
+* Wrap pfree in a signature that matches what zfree expects
 */
 static void
 pg_gzip_free(void* opaque, void* ptr)
@@ -84,9 +82,9 @@ Datum pg_gzip(PG_FUNCTION_ARGS)
 	int zs_rv;
 	z_stream zs;
 	uint8 out[ZCHUNK];
-	bytea *compressed;
+	bytea* compressed;
 
-	bytea *uncompressed = PG_GETARG_BYTEA_P(0);
+	bytea* uncompressed = PG_GETARG_BYTEA_P(0);
 	int32 compression_level = PG_GETARG_INT32(1);
 	uint8* in = (uint8*)(uncompressed->vl_dat);
 	size_t in_size = VARSIZE_ANY_EXHDR(uncompressed);
@@ -104,15 +102,15 @@ Datum pg_gzip(PG_FUNCTION_ARGS)
 	zs.avail_in = in_size;
 
 	if (deflateInit2(&zs,
-		             compression_level, Z_DEFLATED,
-		             WINDOW_BITS|GZIP_ENCODING, /* Magic to initialize in gzip mode */
-		             8, Z_DEFAULT_STRATEGY) != Z_OK)
+	                 compression_level, Z_DEFLATED,
+	                 WINDOW_BITS|GZIP_ENCODING, /* Magic to initialize in gzip mode */
+	                 8, Z_DEFAULT_STRATEGY) != Z_OK)
 		elog(ERROR, "failed to deflateInit2");
 
 	zs.next_out = out;
 	zs.avail_out = ZCHUNK;
 
-	/* compress until end of bytea */
+	/* Compress until deflate stops returning output */
 	zs_rv = Z_OK;
 	while (zs_rv == Z_OK)
 	{
@@ -145,9 +143,9 @@ Datum pg_gunzip(PG_FUNCTION_ARGS)
 	int zs_rv;
 	z_stream zs;
 	uint8 out[ZCHUNK];
-	bytea *uncompressed;
+	bytea* uncompressed;
 
-	bytea *compressed = PG_GETARG_BYTEA_P(0);
+	bytea* compressed = PG_GETARG_BYTEA_P(0);
 	uint8* in = (uint8*)(compressed->vl_dat);
 	size_t in_size = VARSIZE_ANY_EXHDR(compressed);
 
@@ -161,12 +159,13 @@ Datum pg_gunzip(PG_FUNCTION_ARGS)
 	if (inflateInit2(&zs, WINDOW_BITS|ENABLE_ZLIB_GZIP) != Z_OK)
 		elog(ERROR, "failed to inflateInit");
 
+	/* Point z_stream to input and output buffers */
 	zs.next_in = in;
 	zs.avail_in = in_size;
 	zs.next_out = out;
 	zs.avail_out = ZCHUNK;
 
-	/* decompress until end of bytea */
+	/* Decompress until inflate stops returning output */
 	zs_rv = Z_OK;
 	while (zs_rv == Z_OK)
 	{
