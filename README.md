@@ -18,13 +18,29 @@ This extension is for that.
     --------------------------------------------------------------------------
      \x1f8b08000000000000132bc9c82c5600a2dc4a851282ccd48a12002e7a22ff30000000
 
+What, it's longer? No, it only looks that way, because in hex every character requires two hex digits. The original string looks like this in hex (it's longer):
 
-    > SELECT encode(gunzip('\x1f8b08000000000000132bc9c82c5600a2dc4a851282ccd48a12002e7a22ff30000000'), 'escape')
+    > SELECT 'this is my this is my this is my this is my text'::bytea;
+
+                                                   bytea
+    ----------------------------------------------------------------------------------------------------
+     \x74686973206973206d792074686973206973206d792074686973206973206d792074686973206973206d792074657874
+
+And for really long, repetitive things, compression naturally works like a charm:
+
+    > SELECT gzip(repeat('this is my ', 100));
+
+                                                   bytea
+    ----------------------------------------------------------------------------------------------------
+     \x1f8b08000000000000132bc9c82c5600a2dc4a859251e628739439ca24970900d1341c5c4c040000
+
+Converting a `bytea` back into an equivalent `text` uses the `encode()` function with the `escape` encoding.
+
+    > SELECT encode(gunzip(gzip('this is my this is my this is my this is my text')), 'escape')
 
                           encode
     --------------------------------------------------
      this is my this is my this is my this is my text
-    (1 row)
 
 
 ## Functions
