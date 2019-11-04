@@ -68,6 +68,11 @@ pg_gzip_free(void* opaque, void* ptr)
 	return;
 }
 
+/* Zlib defines */
+#define WINDOW_BITS 15
+#define ENABLE_ZLIB_GZIP 32
+#define GZIP_ENCODING 16
+
 /**
 * gzip an uncompressed bytea
 */
@@ -94,11 +99,12 @@ Datum pg_gzip(PG_FUNCTION_ARGS)
 	zs.zalloc = pg_gzip_alloc;
 	zs.zfree = pg_gzip_free;
 	zs.opaque = Z_NULL;
-	if (deflateInit(&zs, compression_level) != Z_OK)
-		elog(ERROR, "failed to deflateInit");
-
 	zs.next_in = in;
 	zs.avail_in = in_size;
+
+	if (deflateInit2(&zs, compression_level, Z_DEFLATED, WINDOW_BITS|GZIP_ENCODING, 8, Z_DEFAULT_STRATEGY) != Z_OK)
+		elog(ERROR, "failed to deflateInit");
+
 	zs.next_out = out;
 	zs.avail_out = ZCHUNK;
 
@@ -144,7 +150,7 @@ Datum pg_gunzip(PG_FUNCTION_ARGS)
 	zs.zalloc = pg_gzip_alloc;
 	zs.zfree = pg_gzip_free;
 	zs.opaque = Z_NULL;
-	if (inflateInit(&zs) != Z_OK)
+	if (inflateInit2(&zs, WINDOW_BITS | ENABLE_ZLIB_GZIP) != Z_OK)
 		elog(ERROR, "failed to inflateInit");
 
 	zs.next_in = in;
