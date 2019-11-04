@@ -1,6 +1,6 @@
 
 
-# Detech pkg-config on the path
+# Detect pkg-config on the path
 PKGCONFIG := $(shell type -p pkg-config || echo NONE)
 
 ifeq ($(PKGCONFIG), NONE)
