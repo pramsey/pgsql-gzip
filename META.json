@@ -2,7 +2,7 @@
    "name": "gzip",
    "abstract": "gzip compress/decompress functions",
    "description": "compress a bytea to a compressed bytea or decompress same",
-   "version": "1.0",
+   "version": "1.0.0",
    "maintainer": [
       "Paul Ramsey <pramsey@cleverelephant.ca>"
    ],
@@ -20,9 +20,9 @@
      "gip": {
        "file": "gip--1.0.sql",
        "docfile": "README.md",
-       "version": "1.0",
+       "version": "1.0.0",
        "abstract": "gzip functions"
-     },
+     }
    },
    "resources": {
       "homepage": "https://github.com/pramsey/pgsql-gzip/",
@@ -42,6 +42,8 @@
    },
    "tags": [
       "gzip",
+      "zlib",
+      "libz",
       "gunzip"
    ]
 }
