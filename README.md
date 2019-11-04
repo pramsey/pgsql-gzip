@@ -39,4 +39,4 @@ This extension is for that.
 
 If you have PostgreSQL devel packages and zlib installed, you should have `pg_config` on your path, so you should be able to just run `make`, then `make install`, then in your database `CREATE EXTENSION gzip`.
 
-If your `libz` is installed in a non-standard location, you may need to edit `ZLIB_PATH`.
+If your `libz` is installed in a non-standard location, you may need to edit `ZLIB_PATH` in the `Makefile`.
