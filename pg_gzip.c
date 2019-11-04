@@ -89,6 +89,8 @@ Datum pg_gzip(PG_FUNCTION_ARGS)
 	uint8* in = (uint8*)(uncompressed->vl_dat);
 	size_t in_size = VARSIZE_ANY_EXHDR(uncompressed);
 
+	/* compression level -1 is default best effort (approx 6) */
+	/* level 0 is no compression, 1-9 are lowest to highest */
 	if (compression_level < -1 || compression_level > 9)
 		elog(ERROR, "invalid compression level: %d", compression_level);
 
