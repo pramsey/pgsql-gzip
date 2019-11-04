@@ -1,0 +1,47 @@
+{
+   "name": "gzip",
+   "abstract": "gzip compress/decompress functions",
+   "description": "compress a bytea to a compressed bytea or decompress same",
+   "version": "1.0",
+   "maintainer": [
+      "Paul Ramsey <pramsey@cleverelephant.ca>"
+   ],
+   "license": {
+      "mit": "http://en.wikipedia.org/wiki/MIT_License"
+   },
+   "prereqs": {
+      "runtime": {
+         "requires": {
+            "PostgreSQL": "9.1.0"
+         },
+      }
+   },
+   "provides": {
+     "gip": {
+       "file": "gip--1.0.sql",
+       "docfile": "README.md",
+       "version": "1.0",
+       "abstract": "gzip functions"
+     },
+   },
+   "resources": {
+      "homepage": "https://github.com/pramsey/pgsql-gzip/",
+      "bugtracker": {
+         "web": "https://github.com/pramsey/pgsql-gzip/issues"
+      },
+      "repository": {
+        "url":  "https://github.com/pramsey/pgsql-gzip.git",
+        "web":  "https://github.com/pramsey/pgsql-gzip/",
+        "type": "git"
+      }
+   },
+   "generated_by": "Paul Ramsey",
+   "meta-spec": {
+      "version": "1.0.0",
+      "url": "http://pgxn.org/meta/spec.txt"
+   },
+   "tags": [
+      "gzip",
+      "gunzip"
+   ]
+}

@@ -1,0 +1,14 @@
+*.o
+*.so
+*.dll
+*.dylib
+*.obj
+*.a
+*.pc
+regression.diffs
+regression.out
+results/
+tmp_check/
+tmp_check_iso/
+output_iso/
+log/
