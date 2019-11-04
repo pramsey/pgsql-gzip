@@ -18,7 +18,7 @@ This extension is for that.
     --------------------------------------------------------------------------
      \x1f8b08000000000000132bc9c82c5600a2dc4a851282ccd48a12002e7a22ff30000000
 
-What, it's longer? No, it only looks that way, because in hex every character requires two hex digits. The original string looks like this in hex (it's longer):
+What, the compressed output is longer?!? No, it only looks that way, because in hex every character requires two hex digits. The original string looks like this in hex:
 
     > SELECT 'this is my this is my this is my this is my text'::bytea;
 
