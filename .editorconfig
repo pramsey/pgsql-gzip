@@ -14,8 +14,8 @@ insert_final_newline = true
 [*.{c,h}]
 indent_style = tab
 
-# YAML files want space indentation
-[*.{yml}]
+# YAML, MD files want space indentation
+[*.{yml,md}]
 indent_style = space
 indent_size = 4
 

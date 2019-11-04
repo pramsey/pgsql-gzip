@@ -85,6 +85,9 @@ Datum pg_gzip(PG_FUNCTION_ARGS)
 	uint8 out[ZCHUNK];
 	bytea *compressed;
 
+	if (compression_level < -1 || compression_level > 9)
+		elog(ERROR, "invalid compression level: %d", compression_level);
+
 	initStringInfo(&si);
 
 	/* Prepare the z_stream state */
