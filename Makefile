@@ -1,4 +1,3 @@
-DEBUG = 1
 
 # Detect pkg-config on the path
 PKGCONFIG := $(shell type -p pkg-config || echo NONE)
@@ -14,6 +13,7 @@ ZLIB_INC = $(shell pkg-config zlib --cflags)
 ZLIB_LIB = $(shell pkg-config zlib --libs)
 endif
 
+#DEBUG = 1
 
 # These should not require modification
 MODULE_big = gzip
