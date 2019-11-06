@@ -41,11 +41,11 @@ To convert a `bytea` back into an equivalent `text` you must use the `encode()` 
     -----------
      test text
 
-    > SELECT encode(gunzip(gzip('this is my this is my this is my this is my text')), 'escape')
+    > SELECT encode(gunzip(gzip('this text has been compressed and then decompressed')), 'escape')
 
                           encode
-    --------------------------------------------------
-     this is my this is my this is my this is my text
+    -----------------------------------------------------
+     this text has been compressed and then decompressed
 
 
 ## Functions
