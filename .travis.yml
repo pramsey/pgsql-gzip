@@ -1,12 +1,11 @@
 language: c
-dist: trusty
+dist: xenial
 sudo: required
 
 addons:
   apt:
     packages:
-    - libz
-    - libcurl4-gnutls-dev
+    - zlib3-dev
     - ca-certificates
     - software-properties-common
     - python-software-properties
