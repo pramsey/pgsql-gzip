@@ -1,0 +1,57 @@
+CREATE EXTENSION gzip;
+SELECT 1 AS test, gzip('this is my this is my this is my this is my text'::bytea) AS gzip_bytea;
+ test |                                gzip_bytea                                
+------+--------------------------------------------------------------------------
+    1 | \x1f8b08000000000000132bc9c82c5600a2dc4a851282ccd48a12002e7a22ff30000000
+(1 row)
+
+SELECT 2 AS test, gzip('this is my this is my this is my this is my text'::text) AS gzip_text;
+ test |                                gzip_text                                 
+------+--------------------------------------------------------------------------
+    2 | \x1f8b08000000000000132bc9c82c5600a2dc4a851282ccd48a12002e7a22ff30000000
+(1 row)
+
+SELECT 3 AS test, gzip(repeat('this is my ', 10000)) AS gzip_long;
+ test |                                                                                                                                                                                                                                                                  gzip_long                                                                                                                                                                                                                                                                   
+------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    3 | \x1f8b0800000000000013edc6a10d00300800b057388f892930fb1e8e986c52d1ce53b1ee8b565555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555fddd01b4c77d49b0ad0100
+(1 row)
+
+SELECT 4 AS test, encode(gunzip(gzip('this is my this is my this is my this is my text')), 'escape') AS gzip_roundtrip;
+ test |                  gzip_roundtrip                  
+------+--------------------------------------------------
+    4 | this is my this is my this is my this is my text
+(1 row)
+
+WITH strs AS (
+	SELECT repeat('pack my box with five dozen liquor jugs ', generate_series(0, 1000)) AS str
+)
+SELECT 5 AS test, sum((str = encode(gunzip(gzip(str)), 'escape'))::integer) AS gzip_sizes
+FROM strs;
+ test | gzip_sizes 
+------+------------
+    5 |       1001
+(1 row)
+
+SELECT 6 AS test, gzip(NULL) AS gzip_null;
+ test | gzip_null 
+------+-----------
+    6 | 
+(1 row)
+
+SELECT 7 AS test, gzip('') AS gzip_empty;
+ test |                 gzip_empty                 
+------+--------------------------------------------
+    7 | \x1f8b080000000000001303000000000000000000
+(1 row)
+
+SELECT 8 AS test, gunzip(NULL) AS gunzip_null;
+ test | gunzip_null 
+------+-------------
+    8 | 
+(1 row)
+
+SELECT 9 AS test, gunzip('') AS gunzip_empty;
+ERROR:  decompression error: 
+SELECT 10 AS test, gunzip('not a gzip bytea'::bytea) AS gunzip_invalid;
+ERROR:  decompression error: incorrect header check

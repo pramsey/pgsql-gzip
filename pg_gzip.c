@@ -125,7 +125,9 @@ Datum pg_gzip(PG_FUNCTION_ARGS)
 		}
 		zs_rv = deflate(&zs, Z_FINISH);
 	}
-	assert(zs_rv == Z_STREAM_END);
+	if (zs_rv != Z_STREAM_END)
+		elog(ERROR, "compression error: %s", zs.msg ? zs.msg : "");
+
 	appendBinaryStringInfo(&si, (char*)out, ZCHUNK - zs.avail_out);
 
 	/* Construct output bytea */
@@ -180,7 +182,10 @@ Datum pg_gunzip(PG_FUNCTION_ARGS)
 		}
 		zs_rv = inflate(&zs, Z_FINISH);
 	}
-	assert(zs_rv == Z_STREAM_END);
+
+	if (zs_rv != Z_STREAM_END)
+		elog(ERROR, "decompression error: %s", zs.msg ? zs.msg : "");
+
 	appendBinaryStringInfo(&si, (char*)out, ZCHUNK - zs.avail_out);
 
 	/* Construct output bytea */

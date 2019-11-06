@@ -1,4 +1,4 @@
-
+DEBUG = 1
 
 # Detect pkg-config on the path
 PKGCONFIG := $(shell type -p pkg-config || echo NONE)
@@ -30,7 +30,7 @@ LIBS += $(ZLIB_LIB)
 SHLIB_LINK := $(LIBS)
 
 ifdef DEBUG
-COPT			+= "-O0 -g"
+COPT			+= -O0 -g
 endif
 
 PGXS := $(shell $(PG_CONFIG) --pgxs)
