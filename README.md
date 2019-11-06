@@ -1,4 +1,4 @@
-# PostgreSQL GZIP/GUNZIP Functions
+# PostgreSQL gzip/gunzip Functions
 
 [![Build Status](https://api.travis-ci.org/pramsey/pgsql-gzip.svg?branch=master)](https://travis-ci.org/pramsey/pgsql-gzip)
 
@@ -6,7 +6,7 @@
 
 Sometimes you just need to compress your `bytea` object before you return it to the client.
 
-Sometimes you receive a compressed binary object from the client, and you have to uncompress it to do something useful.
+Sometimes you receive a compressed `bytea` from the client, and you have to uncompress it before you can work with it.
 
 This extension is for that.
 
@@ -18,7 +18,7 @@ This extension is for that.
     --------------------------------------------------------------------------
      \x1f8b08000000000000132bc9c82c5600a2dc4a851282ccd48a12002e7a22ff30000000
 
-What, the compressed output is longer?!? No, it only looks that way, because in hex every character requires two hex digits. The original string looks like this in hex:
+Wait, what, the compressed output is longer?!? No, it only **looks** that way, because in hex every byte is represented with two hex digits. The original string looks like this in hex:
 
     > SELECT 'this is my this is my this is my this is my text'::bytea;
 
@@ -26,7 +26,7 @@ What, the compressed output is longer?!? No, it only looks that way, because in 
     ----------------------------------------------------------------------------------------------------
      \x74686973206973206d792074686973206973206d792074686973206973206d792074686973206973206d792074657874
 
-And for really long, repetitive things, compression naturally works like a charm:
+For really long, repetitive things, compression naturally works like a charm:
 
     > SELECT gzip(repeat('this is my ', 100));
 
@@ -34,7 +34,12 @@ And for really long, repetitive things, compression naturally works like a charm
     ----------------------------------------------------------------------------------------------------
      \x1f8b08000000000000132bc9c82c5600a2dc4a859251e628739439ca24970900d1341c5c4c040000
 
-Converting a `bytea` back into an equivalent `text` uses the `encode()` function with the `escape` encoding.
+To convert a `bytea` back into an equivalent `text` you must use the `encode()` function with the `escape` encoding.
+
+    > SELECT encode('test text'::bytea, 'escape');
+       encode
+    -----------
+     test text
 
     > SELECT encode(gunzip(gzip('this is my this is my this is my this is my text')), 'escape')
 
