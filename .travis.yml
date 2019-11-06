@@ -6,9 +6,11 @@ addons:
   apt:
     packages:
     - zlib1g-dev
+    - libcurl4-gnutls-dev
     - ca-certificates
     - software-properties-common
     - python-software-properties
+    - gnupg-curl
 
 compiler:
   - gcc
