@@ -1,20 +1,14 @@
 CREATE EXTENSION gzip;
-SELECT gzip('this is my this is my this is my this is my text'::bytea) AS gzip_bytea;
-                                gzip_bytea                                
---------------------------------------------------------------------------
- \x1f8b08000000000000132bc9c82c5600a2dc4a851282ccd48a12002e7a22ff30000000
+SELECT encode(gunzip(gzip('this is my this is my this is my this is my text'::bytea)), 'escape') AS gzip_bytea;
+                    gzip_bytea                    
+--------------------------------------------------
+ this is my this is my this is my this is my text
 (1 row)
 
-SELECT gzip('this is my this is my this is my this is my text'::text) AS gzip_text;
-                                gzip_text                                 
---------------------------------------------------------------------------
- \x1f8b08000000000000132bc9c82c5600a2dc4a851282ccd48a12002e7a22ff30000000
-(1 row)
-
-SELECT gzip(repeat('this is my ', 10000)) AS gzip_long;
-                                                                                                                                                                                                                                                                  gzip_long                                                                                                                                                                                                                                                                   
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
- \x1f8b0800000000000013edc6a10d00300800b057388f892930fb1e8e986c52d1ce53b1ee8b565555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555fddd01b4c77d49b0ad0100
+SELECT encode(gunzip(gzip('this is my this is my this is my this is my text'::text)), 'escape') AS gzip_text;
+                    gzip_text                     
+--------------------------------------------------
+ this is my this is my this is my this is my text
 (1 row)
 
 SELECT encode(gunzip(gzip('this is my this is my this is my this is my text')), 'escape') AS gzip_roundtrip;
@@ -27,6 +21,15 @@ SELECT gunzip(gzip('\x00000000000000000000'::bytea)) AS gzip_roundtrip_zero;
   gzip_roundtrip_zero   
 ------------------------
  \x00000000000000000000
+(1 row)
+
+WITH str AS (
+	SELECT repeat('this is my ', 10000) AS str
+)
+SELECT encode(gunzip(gzip(str)), 'escape') = str AS gzip_long FROM str;
+ gzip_long 
+-----------
+ t
 (1 row)
 
 WITH strs AS (
@@ -45,16 +48,16 @@ SELECT gzip(NULL) AS gzip_null;
  
 (1 row)
 
-SELECT gzip('') AS gzip_empty;
-                 gzip_empty                 
---------------------------------------------
- \x1f8b080000000000001303000000000000000000
+SELECT gunzip(gzip('')) AS gzip_empty;
+ gzip_empty 
+------------
+ \x
 (1 row)
 
-SELECT gzip('\x00'::bytea) AS gzip_zero;
-                  gzip_zero                   
-----------------------------------------------
- \x1f8b08000000000000136300008def02d201000000
+SELECT gunzip(gzip('\x00'::bytea)) AS gzip_zero;
+ gzip_zero 
+-----------
+ \x00
 (1 row)
 
 SELECT gunzip(NULL) AS gunzip_null;
