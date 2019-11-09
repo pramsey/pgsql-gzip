@@ -86,7 +86,7 @@ Datum pg_gzip(PG_FUNCTION_ARGS)
 
 	bytea* uncompressed = PG_GETARG_BYTEA_P(0);
 	int32 compression_level = PG_GETARG_INT32(1);
-	uint8* in = (uint8*)(uncompressed->vl_dat);
+	uint8* in = (uint8*)(VARDATA(uncompressed));
 	size_t in_size = VARSIZE_ANY_EXHDR(uncompressed);
 
 	/* compression level -1 is default best effort (approx 6) */
@@ -132,7 +132,7 @@ Datum pg_gzip(PG_FUNCTION_ARGS)
 
 	/* Construct output bytea */
 	compressed = palloc(si.len + VARHDRSZ);
-	memcpy(compressed->vl_dat, si.data, si.len);
+	memcpy(VARDATA(compressed), si.data, si.len);
 	SET_VARSIZE(compressed, si.len + VARHDRSZ);
 	PG_FREE_IF_COPY(uncompressed, 0);
 	PG_RETURN_POINTER(compressed);
@@ -150,7 +150,7 @@ Datum pg_gunzip(PG_FUNCTION_ARGS)
 	bytea* uncompressed;
 
 	bytea* compressed = PG_GETARG_BYTEA_P(0);
-	uint8* in = (uint8*)(compressed->vl_dat);
+	uint8* in = (uint8*)(VARDATA(compressed));
 	size_t in_size = VARSIZE_ANY_EXHDR(compressed);
 
 	initStringInfo(&si);
@@ -190,7 +190,7 @@ Datum pg_gunzip(PG_FUNCTION_ARGS)
 
 	/* Construct output bytea */
 	uncompressed = palloc(si.len + VARHDRSZ);
-	memcpy(uncompressed->vl_dat, si.data, si.len);
+	memcpy(VARDATA(uncompressed), si.data, si.len);
 	SET_VARSIZE(uncompressed, si.len + VARHDRSZ);
 	PG_FREE_IF_COPY(compressed, 0);
 	PG_RETURN_POINTER(uncompressed);
