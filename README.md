@@ -10,6 +10,8 @@ Sometimes you receive a compressed `bytea` from the client, and you have to unco
 
 This extension is for that.
 
+This extension is **not** for storage compression. PostgreSQL already does tuple compression on the fly if your tuple gets large enough, manually pre-compressing your data using this function won't make things smaller.
+
 ## Examples
 
     > SELECT gzip('this is my this is my this is my this is my text');
