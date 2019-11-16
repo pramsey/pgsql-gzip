@@ -94,8 +94,6 @@ Datum pg_gzip(PG_FUNCTION_ARGS)
 	if (compression_level < -1 || compression_level > 9)
 		elog(ERROR, "invalid compression level: %d", compression_level);
 
-	initStringInfo(&si);
-
 	/* Prepare the z_stream state */
 	zs.zalloc = pg_gzip_alloc;
 	zs.zfree = pg_gzip_free;
@@ -113,6 +111,7 @@ Datum pg_gzip(PG_FUNCTION_ARGS)
 	zs.avail_out = ZCHUNK;
 
 	/* Compress until deflate stops returning output */
+	initStringInfo(&si);
 	zs_rv = Z_OK;
 	while (zs_rv == Z_OK)
 	{
@@ -153,8 +152,6 @@ Datum pg_gunzip(PG_FUNCTION_ARGS)
 	uint8* in = (uint8*)(VARDATA(compressed));
 	size_t in_size = VARSIZE_ANY_EXHDR(compressed);
 
-	initStringInfo(&si);
-
 	/* Prepare the z_stream state */
 	zs.zalloc = pg_gzip_alloc;
 	zs.zfree = pg_gzip_free;
@@ -170,6 +167,7 @@ Datum pg_gunzip(PG_FUNCTION_ARGS)
 	zs.avail_out = ZCHUNK;
 
 	/* Decompress until inflate stops returning output */
+	initStringInfo(&si);
 	zs_rv = Z_OK;
 	while (zs_rv == Z_OK)
 	{
