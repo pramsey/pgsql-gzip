@@ -1,3 +1,5 @@
+# Make sure we do not run any code when using deb-in-docker target
+ifneq ($(MAKECMDGOALS),"deb-in-docker")
 
 # Detect pkg-config on the path
 PKGCONFIG := $(shell type -p pkg-config || echo NONE)
@@ -35,6 +37,9 @@ endif
 
 PGXS := $(shell $(PG_CONFIG) --pgxs)
 include $(PGXS)
+
+endif
+
 
 .PHONY: deb
 deb:
