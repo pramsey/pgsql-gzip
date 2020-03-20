@@ -1,2 +1,2 @@
 #version=4
-#https://github.com/code/code/releases .*/v(.*).tar.gz
+#https://github.com/pramsey/pgsql-gzip/releases .*/v(.*).tar.gz
