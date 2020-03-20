@@ -36,3 +36,15 @@ endif
 PGXS := $(shell $(PG_CONFIG) --pgxs)
 include $(PGXS)
 
+.PHONY: deb
+deb:
+	dpkg-buildpackage -B
+
+.PHONY: deb-in-docker
+deb-in-docker: .image
+	mkdir -p "$$(pwd)/target"
+	docker run --rm -ti -v"$$(pwd)/target:/build" -v "$$(pwd):/build/pgsql-gzip" deb-builder make deb
+
+.PHONY: .image
+.image:
+	docker build -t deb-builder .

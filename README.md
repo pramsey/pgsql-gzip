@@ -64,3 +64,18 @@ To convert a `bytea` back into an equivalent `text` you must use the `encode()` 
 If you have PostgreSQL devel packages and zlib installed, you should have `pg_config` on your path, so you should be able to just run `make`, then `make install`, then in your database `CREATE EXTENSION gzip`.
 
 If your `libz` is installed in a non-standard location, you may need to edit `ZLIB_PATH` in the `Makefile`.
+
+#### Debain/Ubuntu
+
+To build the DEB package make use you have following dependencies installed as well:
+
+```bash
+> apt-get install build-essential fakeroot devscripts
+```
+
+And you will be able to run the `make deb` and get the packege wich can be installed with `dpkg -i <path to package>.deb`
+
+
+#### In Docker
+
+Makefile has a special target for building the DEB packager directly in the docker by running `make deb-in-docker`. Where the `debian:sid` will be used to prepare the image with all the dependencies and the `make deb` target will be run inside it.
