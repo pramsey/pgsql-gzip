@@ -1,5 +1,4 @@
 pgsql-gzip (1.0.0) unstable; urgency=medium
-
   * Initial release of the DEB package
-
+  * DEB package cleanup, readme updates [Yuri Astrakhan <YuriAstrakhan@gmail.com>]
  -- Oleksandr Kylymnychenko <oleksandr@nerdydev.net>  Fri, 20 Mar 2020 13:18:29 +0000

@@ -61,21 +61,42 @@ To convert a `bytea` back into an equivalent `text` you must use the `encode()` 
 
 ### UNIX
 
-If you have PostgreSQL devel packages and zlib installed, you should have `pg_config` on your path, so you should be able to just run `make`, then `make install`, then in your database `CREATE EXTENSION gzip`.
+If you have PostgreSQL devel packages (e.g. `postgresql-server-dev-all`) and zlib (e.g. `zlib1g-dev`) installed, you should have `pg_config` on your path, so you should be able to just run `make`, then `make install`, then in your database `CREATE EXTENSION gzip`.
 
 If your `libz` is installed in a non-standard location, you may need to edit `ZLIB_PATH` in the `Makefile`.
 
-#### Debain/Ubuntu
-
-To build the DEB package make use you have following dependencies installed as well:
+### Debain/Ubuntu
 
 ```bash
-> apt-get install build-essential fakeroot devscripts
+sudo apt-get install build-essential zlib1g-dev postgresql-server-dev-all pkg-config
+make
+make install
+psql ... -c "CREATE EXTENSION gzip"
 ```
 
-And you will be able to run the `make deb` and get the packege wich can be installed with `dpkg -i <path to package>.deb`
+To build the DEB package you will also need `fakeroot` and `devscripts`. See [Dockerfile](./Dockerfile) for a full list.
+
+```bash
+sudo apt-get install build-essential zlib1g-dev postgresql-server-dev-all pkg-config fakeroot devscripts
+make
+make deb
+dpkg -i <path to package>.deb
+```
+
+And you will be able to run the `make deb` and get the packege wich can be installed with ``
 
 
-#### In Docker
+#### deb package build using Docker
 
-Makefile has a special target for building the DEB packager directly in the docker by running `make deb-in-docker`. Where the `debian:sid` will be used to prepare the image with all the dependencies and the `make deb` target will be run inside it.
+Makefile has targets for building the DEB package using Docker image with different base images. This approach only requires `make` and `docker` to be available on the host.
+
+```bash
+make deb-latest   # Uses debian:latest
+make deb-sid      # Uses debian:sid
+```
+
+A custom base image and extra dependencies could also be supplied with a parameters:
+
+```bash
+make deb-docker base=ubuntu:latest extras="pkg1 pkg2 ..."
+```
