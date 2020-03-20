@@ -12,3 +12,6 @@ tmp_check/
 tmp_check_iso/
 output_iso/
 log/
+target/
+build*
+*.bc

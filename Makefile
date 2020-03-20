@@ -1,3 +1,5 @@
+# Make sure we do not run any code when using deb-in-docker target
+ifneq ($(MAKECMDGOALS),"deb-in-docker")
 
 # Detect pkg-config on the path
 PKGCONFIG := $(shell type -p pkg-config || echo NONE)
@@ -36,3 +38,18 @@ endif
 PGXS := $(shell $(PG_CONFIG) --pgxs)
 include $(PGXS)
 
+endif
+
+
+.PHONY: deb
+deb:
+	dpkg-buildpackage -B
+
+.PHONY: deb-in-docker
+deb-in-docker: .image
+	mkdir -p "$$(pwd)/target"
+	docker run --rm -ti -v"$$(pwd)/target:/build" -v "$$(pwd):/build/pgsql-gzip" deb-builder make deb
+
+.PHONY: .image
+.image:
+	docker build -t deb-builder .
