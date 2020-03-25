@@ -61,7 +61,7 @@ To convert a `bytea` back into an equivalent `text` you must use the `encode()` 
 
 ### UNIX
 
-If you have PostgreSQL devel packages (e.g. `postgresql-server-dev-all`) and zlib (e.g. `zlib1g-dev`) installed, you should have `pg_config` on your path, so you should be able to just run `make`, then `make install`, then in your database `CREATE EXTENSION gzip`.
+If you have PostgreSQL devel packages (`postgresql-server-dev-all`) and zlib (`zlib1g-dev`) installed, you should have `pg_config` on your path, so you should be able to just run `make`, then `make install`, then in your database `CREATE EXTENSION gzip`.
 
 If your `libz` is installed in a non-standard location, you may need to edit `ZLIB_PATH` in the `Makefile`.
 
