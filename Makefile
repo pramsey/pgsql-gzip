@@ -52,7 +52,7 @@ base ?= debian:sid
 .PHONY: deb-docker
 deb-docker:
 	@echo "*** Using base=$(base)"
-	docker build "--build-arg=BASE_IMAGE=$(base)" "--build-arg=EXTRA_DEPS=$(extras)" -t pgsql-gzip-$(base) .
+	docker build "--build-arg=BASE_IMAGE=$(base)" -t pgsql-gzip-$(base) .
 	# Create a temp dir that we will remove later. Otherwise docker will create a root-owned dir.
 	mkdir -p "$$(pwd)/target/pgsql-gzip"
 	docker run --rm -ti -u $$(id -u $${USER}):$$(id -g $${USER}) -v "$$(pwd)/target:/build" -v "$$(pwd):/build/pgsql-gzip" pgsql-gzip-$(base) make deb
