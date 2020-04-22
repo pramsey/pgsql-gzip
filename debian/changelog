@@ -1,5 +1,7 @@
+pgsql-gzip (1.0.1) unstable; urgency=medium
+  * DEB package cleanup, docker build improvements, readme updates [Yuri Astrakhan <YuriAstrakhan@gmail.com>]
+ -- Yuri Astrakhan <YuriAstrakhan@gmail.com>  Tue, 21 Apr 2020 22:21:00 +0000
+
 pgsql-gzip (1.0.0) unstable; urgency=medium
-
   * Initial release of the DEB package
-
  -- Oleksandr Kylymnychenko <oleksandr@nerdydev.net>  Fri, 20 Mar 2020 13:18:29 +0000
