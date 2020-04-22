@@ -91,12 +91,11 @@ And you will be able to run the `make deb` and get the packege wich can be insta
 Makefile has targets for building the DEB package using Docker image with different base images. This approach only requires `make` and `docker` to be available on the host.
 
 ```bash
-make deb-latest   # Uses debian:latest
-make deb-sid      # Uses debian:sid
+make deb-latest   # Uses debian:sid
 ```
 
-A custom base image and extra dependencies could also be supplied with a parameters:
+To build an image using a different base, supply it with a parameter:
 
 ```bash
-make deb-docker base=ubuntu:latest extras="pkg1 pkg2 ..."
+make deb-docker base=debian:latest
 ```

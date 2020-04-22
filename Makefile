@@ -48,8 +48,6 @@ deb: clean
 
 # Name of the base Docker image to use. Uses debian:sid by default
 base ?= debian:sid
-# space separated list of additional packages to install in the docker container
-extras ?= ""
 
 .PHONY: deb-docker
 deb-docker:
@@ -59,11 +57,3 @@ deb-docker:
 	mkdir -p "$$(pwd)/target/pgsql-gzip"
 	docker run --rm -ti -u $$(id -u $${USER}):$$(id -g $${USER}) -v "$$(pwd)/target:/build" -v "$$(pwd):/build/pgsql-gzip" pgsql-gzip-$(base) make deb
 	rmdir "$$(pwd)/target/pgsql-gzip" || true
-
-.PHONY: deb-latest
-deb-latest: base=debian:latest
-deb-latest: deb-docker
-
-.PHONY: deb-sid
-deb-sid: base=debian:sid
-deb-sid: deb-docker
