@@ -178,7 +178,7 @@ Datum pg_gunzip(PG_FUNCTION_ARGS)
 			zs.avail_out = ZCHUNK;
 			zs.next_out = out;
 		}
-		zs_rv = inflate(&zs, Z_FINISH);
+		zs_rv = inflate(&zs, Z_SYNC_FLUSH);
 	}
 
 	if (zs_rv != Z_STREAM_END)
