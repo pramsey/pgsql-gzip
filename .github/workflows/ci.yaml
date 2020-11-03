@@ -12,7 +12,7 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v2
       - name: Download and start PostgreSQL
-        run: ./ci/ubuntu-install.sh ${{ matrix.pg }}
+        run: sudo ./ci/ubuntu-install.sh ${{ matrix.pg }}
       - name: Install libraries
         run: sudo apt-get -y install zlib1g-dev
       - name: Build and test
