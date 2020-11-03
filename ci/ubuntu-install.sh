@@ -8,10 +8,12 @@ curl "https://salsa.debian.org/postgresql/postgresql-common/-/raw/master/pgdg/ap
 	> /usr/local/bin/apt.postgresql.org.sh
 chmod 755 /usr/local/bin/apt.postgresql.org.sh
 
-apt-get -y --purge remove postgresql-10
-apt-get -y --purge remove postgresql-11
-apt-get -y --purge remove postgresql-12
-apt-get -y --purge remove postgresql-13
+for VER in 10 11 12 13; do
+
+	apt-get -y --purge remove postgresql-$VER postgresql-server-dev-$VER
+
+done
+
 apt-get -y --purge remove postgresql-common
 
 /usr/local/bin/apt.postgresql.org.sh -i -v $PGVERSION
