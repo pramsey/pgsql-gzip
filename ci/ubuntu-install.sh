@@ -15,5 +15,6 @@ apt-get -y --purge remove postgresql-13
 apt-get -y --purge remove postgresql-common
 
 /usr/local/bin/apt.postgresql.org.sh -i -v $PGVERSION
-pg_createcluster --start $PGVERSION test -p 5432 -- -A trust
 
+pg_createcluster $PGVERSION main -p 5432 -- -A trust
+pg_ctlcluster $PGVERSION main start
