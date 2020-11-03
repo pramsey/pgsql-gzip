@@ -5,7 +5,7 @@ jobs:
   test:
     strategy:
       matrix:
-        pg: [12]
+        pg: [11]
     name: 🐘 PostgreSQL ${{ matrix.pg }}
     runs-on: ubuntu-latest
     steps:
