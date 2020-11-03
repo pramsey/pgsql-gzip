@@ -9,11 +9,11 @@ jobs:
     name: 🐘 PostgreSQL ${{ matrix.pg }}
     runs-on: ubuntu-latest
     steps:
-      - name: Start PostgreSQL
+      - name: Checkout source
+        uses: actions/checkout@v2
+      - name: Download and start PostgreSQL
         run: ./ci/ubuntu-install.sh ${{ matrix.pg }}
       - name: Install libraries
         run: sudo apt-get -y install zlib1g-dev
-      - name: Checkout source
-        uses: actions/checkout@v2
       - name: Build and test
         run: make && make install && make installcheck
