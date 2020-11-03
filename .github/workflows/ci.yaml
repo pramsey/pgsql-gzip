@@ -1,0 +1,20 @@
+name: CI
+on: [push, pull_request]
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        pg: [12, 11, 10]
+    name: 🐘 PostgreSQL ${{ matrix.pg }}
+    runs-on: ubuntu-latest
+    container: pgxn/pgxn-tools
+    steps:
+      - name: Start PostgreSQL
+        run: pg-start ${{ matrix.pg }}
+      - name: Install libraries
+        run: sudo apt-get -y install zlib1g-dev
+      - name: Checkout source
+        uses: actions/checkout@v2
+      - name: Build and test
+        run: pg-build-test
