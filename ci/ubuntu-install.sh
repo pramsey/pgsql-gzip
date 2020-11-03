@@ -8,7 +8,7 @@ set -x
 /etc/init.d/postgresql stop
 
 for VER in 9.1 9.2 9.3 9.4 9.5 9.6 10 11 12 13; do
-	apt-get -y --purge remove postgresql-9.1
+	apt-get -y --purge remove postgresql-$VER
 done
 
 apt-get -y --purge remove postgresql-common
