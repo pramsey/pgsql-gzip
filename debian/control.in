@@ -10,7 +10,7 @@ Vcs-Git: https://github.com/pramsey/pgsql-gzip.git
 
 Package: postgresql-PGVERSION-gzip
 Architecture: any
-Depends: postgresql-12, ${misc:Depends}, ${shlibs:Depends}
+Depends: postgresql-PGVERSION, ${misc:Depends}, ${shlibs:Depends}
 Description: PostgreSQL extension code
  Sometimes you just need to compress your bytea object before you return it to the client.
  Sometimes you receive a compressed bytea from the client, and you have to uncompress it before you can work with it.
