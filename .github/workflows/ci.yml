@@ -23,12 +23,11 @@ jobs:
     strategy:
       matrix:
         ci:
-        # - { PGVER: 10 }
-        # - { PGVER: 11 }
-        # - { PGVER: 12 }
-        # - { PGVER: 13 }
+        - { PGVER: 11 }
+        - { PGVER: 12 }
+        - { PGVER: 13 }
         - { PGVER: 14 }
-        # - { PGVER: 15 }
+        - { PGVER: 15 }
 
     steps:
 
