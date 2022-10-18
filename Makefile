@@ -1,3 +1,5 @@
+# Make sure we do not run any code when using deb-* target
+ifeq (,$(findstring deb-,$(MAKECMDGOALS)))
 
 # Detect pkg-config on the path
 PKGCONFIG := $(shell type -p pkg-config || echo NONE)
@@ -30,9 +32,28 @@ LIBS += $(ZLIB_LIB)
 SHLIB_LINK := $(LIBS)
 
 ifdef DEBUG
-COPT			+= -O0 -g
+COPT += -O0 -g
 endif
 
 PGXS := $(shell $(PG_CONFIG) --pgxs)
 include $(PGXS)
 
+endif
+
+
+.PHONY: deb
+deb: clean
+	pg_buildext updatecontrol
+	dpkg-buildpackage -B
+
+# Name of the base Docker image to use. Uses debian:sid by default
+base ?= debian:sid
+
+.PHONY: deb-docker
+deb-docker:
+	@echo "*** Using base=$(base)"
+	docker build "--build-arg=BASE_IMAGE=$(base)" -t pgsql-gzip-$(base) .
+	# Create a temp dir that we will remove later. Otherwise docker will create a root-owned dir.
+	mkdir -p "$$(pwd)/target/pgsql-gzip"
+	docker run --rm -ti -u $$(id -u $${USER}):$$(id -g $${USER}) -v "$$(pwd)/target:/build" -v "$$(pwd):/build/pgsql-gzip" pgsql-gzip-$(base) make deb
+	rmdir "$$(pwd)/target/pgsql-gzip" || true
