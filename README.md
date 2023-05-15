@@ -1,6 +1,6 @@
-# PostgreSQL gzip/gunzip Functions
+[![Build Status](https://github.com/pramsey/pgsql-gzip/actions/workflows/ci.yml/badge.svg)](https://github.com/pramsey/pgsql-gzip/actions/workflows/ci.yml)
 
-[![Build Status](https://api.travis-ci.org/pramsey/pgsql-gzip.svg?branch=master)](https://travis-ci.org/pramsey/pgsql-gzip)
+# PostgreSQL gzip/gunzip Functions
 
 ## Motivation
 
