@@ -33,17 +33,21 @@ jobs:
 
     - name: 'Start PostgreSQL'
       run: |
-        export PGDATA=/var/lib/postgresql/${{ matrix.ci.PGVER }}/main
-        export PGETC=/etc/postgresql/${{ matrix.ci.PGVER }}/main
-        export PGBIN=/usr/lib/postgresql/${{ matrix.ci.PGVER }}/bin
+        export PGVER=${{ matrix.ci.PGVER }}
+        export PGDATA=/var/lib/postgresql/$PGVER/main
+        export PGETC=/etc/postgresql/$PGVER/main
+        export PGBIN=/usr/lib/postgresql/$PGVER/bin
         sudo cp ./ci/pg_hba.conf $PGETC/pg_hba.conf
         sudo su postgres -c "$PGBIN/pg_ctl --pgdata $PGDATA start -o '-c config_file=$PGETC/postgresql.conf -p 5432'"
 
     - name: 'Build & Test'
       run: |
-        export PATH=/usr/lib/postgresql/${{ matrix.ci.PGVER }}/bin/:$PATH
+        export PGVER=${{ matrix.ci.PGVER }}
+        export PGBIN=/usr/lib/postgresql/$PGVER/bin
+        export PATH=$PGBIN:$PATH
         export PG_CFLAGS=-Werror
+        export PG_CONFIG=$PGBIN/pg_config
         make
-        sudo -E make PG_CONFIG=/usr/lib/postgresql/${{ matrix.ci.PGVER }}/bin/pg_config install
+        sudo -E make PG_CONFIG=$PG_CONFIG install
         PGUSER=postgres make installcheck || (cat regression.diffs && /bin/false)
 
