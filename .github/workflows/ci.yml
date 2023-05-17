@@ -8,16 +8,7 @@ on: [push, pull_request]
 jobs:
   linux:
 
-    runs-on: ubuntu-20.04
-
-    # Github Runner for Ubuntu 20.04
-    # has PgSQL 14 installed by default
-    # We remove that, and then install the
-    # version we are testing.
-    env:
-      OS_PGVER: 14
-      OS_NAME: focal-pgdg
-
+    runs-on: ubuntu-latest
 
     name: "CI"
     strategy:
@@ -51,7 +42,8 @@ jobs:
     - name: 'Build & Test'
       run: |
         export PATH=/usr/lib/postgresql/${{ matrix.ci.PGVER }}/bin/:$PATH
-        PG_CFLAGS=-Werror make
+        export PG_CFLAGS=-Werror
+        make
         sudo make install
         PGUSER=postgres make installcheck || (cat regression.diffs && /bin/false)
 
