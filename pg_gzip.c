@@ -40,6 +40,9 @@
 #include <postgres.h>
 #include <fmgr.h>
 #include <funcapi.h>
+#if PG_VERSION_NUM > 150000
+#include <varatt.h>
+#endif
 
 /* LibZ */
 #include <zlib.h>
