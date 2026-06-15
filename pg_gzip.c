@@ -40,7 +40,7 @@
 #include <postgres.h>
 #include <fmgr.h>
 #include <funcapi.h>
-#if PG_VERSION_NUM > 150000
+#if PG_VERSION_NUM >= 160000
 #include <varatt.h>
 #endif
 
