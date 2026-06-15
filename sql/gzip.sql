@@ -26,3 +26,7 @@ SELECT gunzip('\x00'::bytea) AS gunzip_zero;
 SELECT gunzip('\x0000'::bytea) AS gunzip_zerozero;
 SELECT gunzip('not a gzip bytea'::bytea) AS gunzip_invalid;
 
+SET gzip.max_size = 1000;
+SELECT gunzip(gzip(repeat('x', 2000)::bytea)) AS gunzip_overlimit;
+RESET gzip.max_size;
+

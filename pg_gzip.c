@@ -40,6 +40,7 @@
 #include <postgres.h>
 #include <fmgr.h>
 #include <funcapi.h>
+#include <utils/guc.h>
 #if PG_VERSION_NUM >= 160000
 #include <varatt.h>
 #endif
@@ -49,6 +50,26 @@
 
 /* Set up PgSQL */
 PG_MODULE_MAGIC;
+
+/* GUC: maximum decompressed output size in bytes; -1 = unlimited */
+static int gzip_max_size;
+
+void _PG_init(void);
+void
+_PG_init(void)
+{
+	DefineCustomIntVariable(
+		"gzip.max_size",
+		"Maximum allowed output size for gunzip(), in bytes. -1 disables the limit.",
+		NULL,
+		&gzip_max_size,
+		268435456,   /* default: 256MB */
+		-1,          /* min: -1 = unlimited */
+		INT_MAX,
+		PGC_USERSET,
+		GUC_UNIT_BYTE,
+		NULL, NULL, NULL);
+}
 
 /**
 * Wrap palloc in a signature that matches what zalloc expects
@@ -178,6 +199,8 @@ Datum pg_gunzip(PG_FUNCTION_ARGS)
 		{
 			/* build up output in stringinfo */
 			appendBinaryStringInfo(&si, (char*)out, ZCHUNK);
+			if (gzip_max_size >= 0 && si.len > gzip_max_size)
+				elog(ERROR, "decompressed output exceeds gzip.max_size (%d bytes)", gzip_max_size);
 			zs.avail_out = ZCHUNK;
 			zs.next_out = out;
 		}
@@ -188,6 +211,8 @@ Datum pg_gunzip(PG_FUNCTION_ARGS)
 		elog(ERROR, "decompression error: %s", zs.msg ? zs.msg : "");
 
 	appendBinaryStringInfo(&si, (char*)out, ZCHUNK - zs.avail_out);
+	if (gzip_max_size >= 0 && si.len > gzip_max_size)
+		elog(ERROR, "decompressed output exceeds gzip.max_size (%d bytes)", gzip_max_size);
 
 	/* Construct output bytea */
 	uncompressed = palloc(si.len + VARHDRSZ);

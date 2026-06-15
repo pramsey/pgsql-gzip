@@ -74,3 +74,7 @@ SELECT gunzip('\x0000'::bytea) AS gunzip_zerozero;
 ERROR:  decompression error: unknown compression method
 SELECT gunzip('not a gzip bytea'::bytea) AS gunzip_invalid;
 ERROR:  decompression error: incorrect header check
+SET gzip.max_size = 1000;
+SELECT gunzip(gzip(repeat('x', 2000)::bytea)) AS gunzip_overlimit;
+ERROR:  decompressed output exceeds gzip.max_size (1000 bytes)
+RESET gzip.max_size;
