@@ -2,7 +2,7 @@
 
 # PostgreSQL gzip/gunzip Functions
 
-## Motivation
+## Motivation 
 
 Sometimes you just need to compress your `bytea` object before you return it to the client.
 
