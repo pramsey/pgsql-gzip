@@ -22,7 +22,7 @@ jobs:
       uses: actions/checkout@v6
 
     - name: 'Install libz'
-      run: apt-get -y install libz-dev
+      run: apt-get -y install zlib1g-dev
 
     - name: 'Start PostgreSQL ${{ matrix.pg }}'
       run: pg-start ${{ matrix.pg }}
