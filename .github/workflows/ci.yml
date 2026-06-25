@@ -21,7 +21,7 @@ jobs:
     - name: 'Check Out'
       uses: actions/checkout@v6
 
-    - name: 'Install libz'
+    - name: 'Install zlib'
       run: apt-get -y install zlib1g-dev
 
     - name: 'Start PostgreSQL ${{ matrix.pg }}'
