@@ -21,6 +21,9 @@ jobs:
     - name: 'Check Out'
       uses: actions/checkout@v6
 
+    - name: 'Install libz'
+      run: apt-get -y install libz-dev
+
     - name: 'Start PostgreSQL ${{ matrix.pg }}'
       run: pg-start ${{ matrix.pg }}
 
