@@ -48,16 +48,13 @@
 /* LibZ */
 #include <zlib.h>
 
-/* Set up PgSQL */
-#define GZIP_VERSION_STR(x) #x
-
 /*
  * Set up as a PgSQL module
  */
 #ifdef PG_MODULE_MAGIC_EXT
 PG_MODULE_MAGIC_EXT(
     .name = "gzip",
-    .version = GZIP_VERSION_STR(GZIP_VERSION)
+    .version = GZIP_VERSION
 );
 #else
 PG_MODULE_MAGIC;

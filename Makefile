@@ -29,7 +29,7 @@ EXTVERSION = $(shell grep default_version $(EXTENSION).control | \
                cut -f2 -d= | tr -d "'" | tr -d " ")
 
 PG_CONFIG = pg_config
-PG_CFLAGS += -D GZIP_VERSION=$(EXTVERSION)
+PG_CFLAGS += -D GZIP_VERSION=\"$(EXTVERSION)\"
 
 CFLAGS += $(ZLIB_INC)
 LIBS += $(ZLIB_LIB)
