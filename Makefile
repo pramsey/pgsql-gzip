@@ -25,16 +25,11 @@ DATA = gzip--1.0.sql
 REGRESS = gzip
 EXTRA_CLEAN =
 
-EXTVERSION = $(shell grep default_version $(EXTENSION).control | \
-               cut -f2 -d= | tr -d "'" | tr -d " ")
-
-PG_CONFIG = pg_config
-PG_CFLAGS += -D GZIP_VERSION=\"$(EXTVERSION)\"
+PG_CONFIG ?= pg_config
 
 CFLAGS += $(ZLIB_INC)
 LIBS += $(ZLIB_LIB)
 SHLIB_LINK := $(LIBS)
-
 
 
 ifdef DEBUG

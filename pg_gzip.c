@@ -48,6 +48,8 @@
 /* LibZ */
 #include <zlib.h>
 
+#define GZIP_VERSION "1.0"
+
 /*
  * Set up as a PgSQL module
  */
