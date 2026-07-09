@@ -51,6 +51,18 @@
 /*
  * Set up as a PgSQL module
  */
+
+/*
+ * GZIP_VERSION is normally injected via -D on the compiler command line
+ * (see Makefile). PG19's PG_MODULE_MAGIC_EXT() requires .version to be a
+ * real string literal, so if the define doesn't reach this translation
+ * unit for any reason, fall back to a sane default instead of failing
+ * with "use of undeclared identifier 'GZIP_VERSION'".
+ */
+#ifndef GZIP_VERSION
+#define GZIP_VERSION "1.0"
+#endif
+
 #ifdef PG_MODULE_MAGIC_EXT
 PG_MODULE_MAGIC_EXT(
     .name = "gzip",
