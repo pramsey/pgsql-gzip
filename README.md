@@ -56,6 +56,24 @@ To convert a `bytea` back into an equivalent `text` you must use the `encode()` 
 * `gzip(uncompressed TEXT, [compression_level INTEGER])` returns `BYTEA`
 * `gunzip(compressed BYTEA)` returns `BYTEA`
 
+## Configuration
+
+* `gzip.max_size` (default `256MB`) caps the decompressed output size of
+  `gunzip()`. Inputs that inflate beyond the cap raise an error instead of
+  allocating without bound. Set it to `-1` to disable the limit.
+
+      > SET gzip.max_size = '16MB';
+      > SELECT gunzip(compressed_col) FROM t;
+      ERROR:  decompressed output exceeds gzip.max_size (16777216 bytes)
+
+Gzip compresses repetitive data very well, so even a small compressed input
+can inflate to an enormous output ("zip bomb"). Decompression happens
+entirely in backend memory: without a cap, a highly compressible input can
+drive the backend into the operating system's out-of-memory killer, which
+terminates the process with `SIGKILL` and forces the whole cluster through
+crash recovery. If you accept compressed data from clients, keep the cap at
+a value your `bytea` consumers actually need.
+
 
 ## Installation
 
