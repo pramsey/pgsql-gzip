@@ -40,6 +40,7 @@
 #include <postgres.h>
 #include <fmgr.h>
 #include <funcapi.h>
+#include <miscadmin.h>
 #include <utils/guc.h>
 #if PG_VERSION_NUM >= 160000
 #include <varatt.h>
@@ -89,7 +90,7 @@ _PG_init(void)
 static void*
 pg_gzip_alloc(void* opaque, unsigned int items, unsigned int itemsize)
 {
-	return palloc(items * itemsize);
+	return palloc((Size)items * itemsize);
 }
 
 /**
@@ -151,6 +152,7 @@ Datum pg_gzip(PG_FUNCTION_ARGS)
 	zs_rv = Z_OK;
 	while (zs_rv == Z_OK)
 	{
+		CHECK_FOR_INTERRUPTS();
 		if (zs.avail_out == 0)
 		{
 			/* build up output in stringinfo */
@@ -202,16 +204,46 @@ Datum pg_gunzip(PG_FUNCTION_ARGS)
 	zs.next_out = out;
 	zs.avail_out = ZCHUNK;
 
-	/* Decompress until inflate stops returning output */
+	/*
+	 * Build the output in bytea layout: reserve room for the varlena
+	 * header now and fill it in at the end, so the decompressed data
+	 * does not need to be copied into a fresh allocation on the way out.
+	 */
 	initStringInfo(&si);
+	appendStringInfoSpaces(&si, VARHDRSZ);
+
+	/*
+	 * A complete gzip stream ends with a four-byte little-endian trailer
+	 * (ISIZE) holding the uncompressed size modulo 2^32. It is part of the
+	 * user-supplied input so it cannot be trusted, but clamped to the size
+	 * cap it makes a good pre-allocation hint, avoiding the repeated
+	 * enlarge-and-copy cycles (and their transient memory spikes) that
+	 * doubling growth causes on large inputs.
+	 */
+	if (in_size >= 18)
+	{
+		uint8* tail = in + in_size - 4;
+		uint64 hint = (uint64)tail[0] | ((uint64)tail[1] << 8) |
+		              ((uint64)tail[2] << 16) | ((uint64)tail[3] << 24);
+
+		if (gzip_max_size >= 0 && hint > (uint64)gzip_max_size)
+			hint = gzip_max_size;
+		if (hint > MaxAllocSize - VARHDRSZ - 1)
+			hint = MaxAllocSize - VARHDRSZ - 1;
+		if (hint > 0)
+			enlargeStringInfo(&si, (int)hint);
+	}
+
+	/* Decompress until inflate stops returning output */
 	zs_rv = Z_OK;
 	while (zs_rv == Z_OK)
 	{
+		CHECK_FOR_INTERRUPTS();
 		if (zs.avail_out == 0)
 		{
 			/* build up output in stringinfo */
 			appendBinaryStringInfo(&si, (char*)out, ZCHUNK);
-			if (gzip_max_size >= 0 && si.len > gzip_max_size)
+			if (gzip_max_size >= 0 && si.len - VARHDRSZ > gzip_max_size)
 				elog(ERROR, "decompressed output exceeds gzip.max_size (%d bytes)", gzip_max_size);
 			zs.avail_out = ZCHUNK;
 			zs.next_out = out;
@@ -223,13 +255,12 @@ Datum pg_gunzip(PG_FUNCTION_ARGS)
 		elog(ERROR, "decompression error: %s", zs.msg ? zs.msg : "");
 
 	appendBinaryStringInfo(&si, (char*)out, ZCHUNK - zs.avail_out);
-	if (gzip_max_size >= 0 && si.len > gzip_max_size)
+	if (gzip_max_size >= 0 && si.len - VARHDRSZ > gzip_max_size)
 		elog(ERROR, "decompressed output exceeds gzip.max_size (%d bytes)", gzip_max_size);
 
-	/* Construct output bytea */
-	uncompressed = palloc(si.len + VARHDRSZ);
-	memcpy(VARDATA(uncompressed), si.data, si.len);
-	SET_VARSIZE(uncompressed, si.len + VARHDRSZ);
+	/* Fill in the varlena header reserved above */
+	uncompressed = (bytea*)si.data;
+	SET_VARSIZE(uncompressed, si.len);
 	PG_FREE_IF_COPY(compressed, 0);
 	PG_RETURN_POINTER(uncompressed);
 }
